@@ -35,6 +35,15 @@ Sample issues (`sample: true`) are for previewing the layout. They show in
   (`git -C ../PianoGlass log --since=<1st of month> --no-merges`),
   `../PianoGlass/docs/history.md` and `../Milestones`.
 
+## Where it lives
+
+- Live: https://ryan-abou.github.io/bar9/ (repo `ryan-abou/bar9`, deployed by
+  GitHub Actions on every push to `main`).
+- Ryan's portfolio (https://ryan-abou.github.io/, repo `ryan-abou/ryan-abou.github.io`)
+  has a "Bar 9" section that reads `/bar9/rss.xml` in the browser and lists the
+  three newest issues. It expects RSS titles shaped `No. <n>: <title>`, so keep
+  that format in `src/pages/rss.xml.js`.
+
 ## The site
 
 Astro 6 (pinned: Astro 7 needs a newer Node than this PC has), static, hosted on
