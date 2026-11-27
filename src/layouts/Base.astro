@@ -52,7 +52,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <footer>
       <div class="footer-staff"><Staff end /></div>
       <div class="wrap site-footer">
-        <span>I'm {SITE.author}. I post a new one on the first Sunday of the month, and there's an <a href={url('/rss.xml')}>RSS feed</a> if you use a reader.</span>
+        <span>I'm {SITE.author}. I post a new one on the first Sunday of the month. <a href={url('/#subscribe')}>Get it by email</a>, or use the <a href={url('/rss.xml')}>RSS feed</a>.</span>
         <span><a href={SITE.links.portfolio}>My other work</a></span>
       </div>
     </footer>

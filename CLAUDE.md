@@ -44,6 +44,18 @@ Sample issues (`sample: true`) are for previewing the layout. They show in
   three newest issues. It expects RSS titles shaped `No. <n>: <title>`, so keep
   that format in `src/pages/rss.xml.js`.
 
+## Email newsletter (Kit)
+
+- Kit account "Bar 9", free plan (up to 10,000 subscribers). From name "Ryan from
+  Bar 9". The mailing address in every email is Kit's own (Seattle PMB), never
+  Ryan's home address.
+- Form "Bar 9 signup", id 10249989. Signup boxes on the blog (`Signup.astro`: home
+  page, end of every issue) and the portfolio's Bar 9 section post straight to
+  `https://app.kit.com/forms/10249989/subscriptions` and answer inline.
+- Double opt-in: Kit emails a confirm link, then redirects to `/bar9/welcome/`.
+- Sending an issue: free plan has no RSS-to-email, so after publishing, write the
+  email version and Ryan sends it as a Kit Broadcast.
+
 ## The site
 
 Astro 6 (pinned: Astro 7 needs a newer Node than this PC has), static, hosted on

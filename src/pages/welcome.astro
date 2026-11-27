@@ -1,0 +1,36 @@
+---
+// Kit sends people here after they click the link in the confirmation email.
+import Base from '../layouts/Base.astro';
+import { getIssues } from '../lib/issues';
+import { plan } from '../data/plan';
+import { url } from '../site';
+
+const issues = await getIssues();
+const latest = issues.at(-1);
+const written = new Set(issues.map((i) => i.data.bar));
+const next = plan.find((p) => !written.has(p.bar));
+---
+<Base title="You're in">
+  <section class="wrap">
+    <div class="welcome">
+      <p class="kicker">Subscribed</p>
+      <h1 class="title">You're in.</h1>
+      <p class="dek">
+        Thanks for confirming. {next
+          ? <>The next issue, “{next.title},” comes out on the first Sunday of {next.month}.</>
+          : <>The next issue comes out on the first Sunday of the month.</>}
+        It'll come from “Ryan from Bar 9,” so if it ends up somewhere odd, drag it to your main inbox once and it'll land there after that.
+      </p>
+      <p class="links">
+        {latest
+          ? <a href={url(`/issues/${latest.id}/`)}>Read the newest one while you wait</a>
+          : <a href={url('/')}>Back to Bar 9</a>}
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .welcome { display: flex; flex-direction: column; gap: 18px; padding: 64px 0 24px; border-top: 2px solid var(--ink); margin-top: 56px; max-width: 760px; }
+  .links { margin: 8px 0 0; font-size: 19px; }
+</style>

@@ -7,6 +7,10 @@ export const SITE = {
   description:
     'I write about the piano once a month, and about PianoGlass, the piano trainer I’m building for the Meta Quest 3.',
   schedule: 'comes out on the first Sunday of each month',
+  // Kit form "Bar 9 signup". Kit sends a confirmation email, then redirects to /welcome/.
+  newsletter: {
+    action: 'https://app.kit.com/forms/10249989/subscriptions',
+  },
   links: {
     portfolio: 'https://ryan-abou.github.io/',
     // The portfolio's first screen plays PianoGlass's falling notes with sound and clickable keys.

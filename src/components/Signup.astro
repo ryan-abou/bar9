@@ -1,0 +1,92 @@
+---
+// Email signup, posted straight to Kit. Works without JavaScript (Kit shows its own page);
+// with JavaScript it stays on the page and answers inline.
+import { SITE } from '../site';
+
+interface Props {
+  heading?: string;
+  text?: string;
+  id?: string;
+}
+const {
+  heading = 'Get each issue by email',
+  text = 'One email on the first Sunday of the month, when a new issue is out. Nothing else.',
+  id = 'subscribe',
+} = Astro.props;
+---
+<section class="signup" id={id} aria-labelledby={`${id}-h`}>
+  <h2 id={`${id}-h`}>{heading}</h2>
+  <p class="lede">{text}</p>
+  <form class="signup-form" action={SITE.newsletter.action} method="post" novalidate>
+    <label class="sr" for={`${id}-email`}>Email address</label>
+    <input id={`${id}-email`} type="email" name="email_address" placeholder="you@example.com" autocomplete="email" required />
+    <button type="submit">Sign up</button>
+  </form>
+  <p class="status" role="status" aria-live="polite"></p>
+  <p class="fine">You'll get one email to confirm first. Every email has an unsubscribe link.</p>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLFormElement>('.signup-form').forEach((form) => {
+    const box = form.closest('.signup')!;
+    const status = box.querySelector<HTMLElement>('.status')!;
+    const button = form.querySelector('button')!;
+    const input = form.querySelector('input')!;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = input.value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        status.textContent = "That doesn't look like an email address.";
+        box.classList.add('error');
+        input.focus();
+        return;
+      }
+      box.classList.remove('error');
+      button.disabled = true;
+      status.textContent = 'Signing you up…';
+      try {
+        const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.status === 'success') {
+          box.classList.add('done');
+          status.textContent = `Almost done. Check ${email} and click the link in the email from Ryan to confirm.`;
+          form.reset();
+        } else {
+          const msg = data.errors?.messages?.[0];
+          box.classList.add('error');
+          status.textContent = msg ? `${msg}.`.replace(/\.\.$/, '.') : "Something went wrong. Try again in a minute.";
+        }
+      } catch {
+        box.classList.add('error');
+        status.textContent = "Couldn't reach the signup service. Check your connection and try again.";
+      } finally {
+        button.disabled = false;
+      }
+    });
+  });
+</script>
+
+<style>
+  .signup { padding: 28px 0 8px; border-top: 2px solid var(--ink); }
+  h2 { margin: 0 0 6px; font-family: var(--display); font-weight: 400; font-size: 30px; line-height: 1.15; }
+  .lede { margin: 0 0 18px; font-size: 18px; line-height: 1.55; color: var(--ink-2); max-width: 560px; }
+  .signup-form { display: flex; flex-wrap: wrap; gap: 10px; max-width: 560px; }
+  input {
+    flex: 1 1 260px; min-width: 0; min-height: 48px; padding: 0 14px;
+    font: inherit; font-size: 18px; color: var(--ink);
+    background: #fbf9f4; border: 1px solid var(--staff); border-radius: 4px;
+  }
+  input::placeholder { color: #8f887c; }
+  input:focus { outline: 2px solid var(--ink); outline-offset: 1px; border-color: var(--ink); }
+  button {
+    min-height: 48px; padding: 0 22px; font: inherit; font-size: 18px;
+    color: var(--paper); background: var(--ink); border: 0; border-radius: 4px; cursor: pointer;
+  }
+  button:hover { background: #000; }
+  button:disabled { opacity: 0.6; cursor: wait; }
+  .status { margin: 12px 0 0; min-height: 1.5em; font-size: 17px; font-style: italic; color: var(--ink-2); }
+  .done .status { color: var(--ink); }
+  .error .status { color: var(--pencil); }
+  .fine { margin: 4px 0 0; font-size: 14px; color: var(--gray); }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>

@@ -2,6 +2,7 @@
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import PianoGlassPanel from '../../components/PianoGlassPanel.astro';
+import Signup from '../../components/Signup.astro';
 import { getIssues, readingTime, type Issue } from '../../lib/issues';
 import { plan } from '../../data/plan';
 import { url, formatDate } from '../../site';
@@ -72,6 +73,12 @@ const tag = data.sample ? ' · sample' : data.status === 'draft' ? ' · draft' :
   <div class="wrap panel">
     <div class="score three">
       <PianoGlassPanel {...data.pianoglass} />
+    </div>
+  </div>
+
+  <div class="wrap signup-row">
+    <div class="score three">
+      <Signup heading="Get the next one by email" />
     </div>
   </div>
 
@@ -163,6 +170,7 @@ const tag = data.sample ? ' · sample' : data.status === 'draft' ? ' · draft' :
   .toc-n { font-style: italic; min-width: 0.8em; }
 
   .panel { padding-top: 64px; padding-bottom: 72px; }
+  .signup-row { padding-bottom: 56px; }
   .src { border-top: 1px solid var(--rule); padding-top: 24px; }
   .src h2 { margin: 0 0 14px; font-family: var(--display); font-size: 24px; font-weight: 400; }
   .src ol { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 10px; font-size: 17px; line-height: 1.55; color: var(--ink-2); }
