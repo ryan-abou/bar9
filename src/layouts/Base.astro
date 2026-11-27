@@ -1,0 +1,60 @@
+---
+import '../styles/global.css';
+import Logo from '../components/Logo.astro';
+import Staff from '../components/Staff.astro';
+import { SITE, url } from '../site';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description = SITE.description } = Astro.props;
+const fullTitle = title ? `${title} · ${SITE.name}` : SITE.name;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={SITE.author} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" type="application/rss+xml" title={SITE.name} href={url('/rss.xml')} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=Outfit:wght@300..600&display=swap"
+    />
+  </head>
+  <body>
+    <header>
+      <div class="wrap site-header">
+        <Logo />
+        <nav class="site-nav" aria-label="Main">
+          <a href={url('/#issues')}>Issues</a>
+          <a href={url('/#about')}>About</a>
+          <a href={SITE.links.pianoglass}>PianoGlass</a>
+          <a href={url('/rss.xml')}>RSS</a>
+        </nav>
+      </div>
+      <div class="masthead-staff"><Staff /></div>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer>
+      <div class="footer-staff"><Staff end /></div>
+      <div class="wrap site-footer">
+        <span>I'm {SITE.author}. I post a new one on the first Sunday of the month, and there's an <a href={url('/rss.xml')}>RSS feed</a> if you use a reader.</span>
+        <span><a href={SITE.links.portfolio}>My other work</a></span>
+      </div>
+    </footer>
+  </body>
+</html>

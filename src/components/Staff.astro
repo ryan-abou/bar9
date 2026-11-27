@@ -1,0 +1,34 @@
+---
+// A full-width strip of staff that runs off both edges of the page.
+// Top of the page: measure numbers with bar 9 circled. Bottom: ends in a final double barline.
+import PencilCircle from './PencilCircle.astro';
+
+interface Props { end?: boolean }
+const { end = false } = Astro.props;
+const measures = Array.from({ length: 12 }, (_, i) => i + 1);
+---
+<div class:list={['staff', { end }]} aria-hidden="true">
+  {measures.map((n) => (
+    <div class="m">
+      {!end && <span class:list={['n', { nine: n === 9 }]}>{n === 9 ? <PencilCircle>{n}</PencilCircle> : n}</span>}
+      <div class="lines" />
+    </div>
+  ))}
+</div>
+
+<style>
+  .staff { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); width: 100%; }
+  .m { display: flex; flex-direction: column; min-width: 0; }
+  .n { height: 24px; padding-left: 8px; font-style: italic; font-size: 14px; line-height: 24px; color: var(--gray); }
+  .nine { color: var(--ink); }
+  .lines {
+    height: 25px;
+    border-right: 1px solid var(--ink);
+    background: repeating-linear-gradient(to bottom, var(--staff) 0 1px, transparent 1px 6px);
+  }
+  .end .m:last-child .lines { position: relative; border-right: 5px solid var(--ink); margin-right: 24px; }
+  .end .m:last-child .lines::after { content: ''; position: absolute; top: 0; bottom: 0; right: 8px; width: 1px; background: var(--ink); }
+  @media (max-width: 700px) {
+    .n:not(.nine) { visibility: hidden; }
+  }
+</style>

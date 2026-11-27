@@ -1,0 +1,146 @@
+---
+// "This month in PianoGlass": the one part of the blog drawn in the app's own colors.
+import { SITE } from '../site';
+interface Props {
+  month: string;
+  body: string[];
+  youtube?: string;
+  clipNeeded?: string;
+  next?: string;
+}
+const { month, body, youtube, clipNeeded, next } = Astro.props;
+
+// A short strip of the note highway: left hand in sand, right hand in blue.
+const n = 14;
+const w = 100 / n;
+const lit: Record<number, string> = { 3: 'var(--pg-left)', 10: 'var(--pg-right)' };
+const whites = Array.from({ length: n }, (_, i) => lit[i] ?? 'var(--pg-key)');
+const blacks: number[] = [];
+for (let o = 0; o < 2; o++) for (const p of [0, 1, 3, 4, 5]) blacks.push(((o * 7 + p + 1) * w - 1.8));
+const note = (k: number, top: number, h: number, color: string) => ({ left: k * w + 0.5, width: w - 1, top, h, color });
+const notes = [
+  note(1, 0, 40, 'var(--pg-left)'), note(3, 40, 52, 'var(--pg-left)'), note(5, 10, 46, 'var(--pg-left)'),
+  note(8, 0, 30, 'var(--pg-right)'), note(9, 60, 20, 'var(--pg-right)'), note(10, 46, 46, 'var(--pg-right)'), note(12, 16, 50, 'var(--pg-right)'),
+];
+---
+<div class="clipped">
+<!-- The card slides between the clip's loops: the inner loop sits behind the card, the outer loop in front. -->
+<svg class="paperclip back" aria-hidden="true" viewBox="0 0 30 96" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path class="wire-shadow" d="M9 28 V76 A6 6 0 0 0 21 76 V14" />
+  <path class="wire dim" d="M9 28 V76 A6 6 0 0 0 21 76 V14" />
+</svg>
+<svg class="paperclip front" aria-hidden="true" viewBox="0 0 30 96" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path class="wire-shadow" d="M21 14 A10 10 0 0 0 1 14 V80 A14 14 0 0 0 29 80 V24" />
+  <path class="wire" d="M21 14 A10 10 0 0 0 1 14 V80 A14 14 0 0 0 29 80 V24" />
+  <path class="wire-shine" d="M21 14 A10 10 0 0 0 1 14 V80 A14 14 0 0 0 29 80 V24" />
+</svg>
+<section class="pg" aria-labelledby="pg-h">
+  <div class="highway" aria-hidden="true">
+    <div class="notes">
+      {notes.map((x) => <span style={`left:${x.left}%;width:${x.width}%;top:${x.top}px;height:${x.h}px;background:${x.color}`} />)}
+    </div>
+    <div class="keys">
+      {whites.map((fill) => <span class="white" style={`background:${fill}`} />)}
+      {blacks.map((left) => <span class="black" style={`left:${left}%`} />)}
+    </div>
+  </div>
+  <div class="body">
+    <h2 id="pg-h">Meanwhile, in PianoGlass <span class="when">{month}</span></h2>
+    {body.map((para) => <p>{para}</p>)}
+    {youtube ? (
+      <div class="clip">
+        <iframe
+          src={`https://www.youtube-nocookie.com/embed/${youtube}`}
+          title="Clip filmed through the PianoGlass headset"
+          loading="lazy"
+          allow="encrypted-media; picture-in-picture"
+          allowfullscreen
+        />
+      </div>
+    ) : clipNeeded && import.meta.env.DEV ? (
+      <div class="clip placeholder-dark">[Clip needed: {clipNeeded}]</div>
+    ) : null}
+    {next && <p class="next">Next in PianoGlass: {next}</p>}
+    <a class="try" href={SITE.links.demo}>
+      Play the falling notes in your browser <span aria-hidden="true">→</span>
+    </a>
+  </div>
+</section>
+</div>
+
+<style>
+  /* The card is clipped onto the page: tilted a little, lifted off the paper, held by a paperclip. */
+  .clipped { position: relative; transform: rotate(-0.7deg); isolation: isolate; }
+  .pg {
+    position: relative;
+    z-index: 1;
+    background: var(--pg-bg);
+    color: var(--pg-ink);
+    border-radius: 6px;
+    overflow: hidden;
+    font-family: var(--sans);
+    box-shadow:
+      0 1px 1px rgba(36, 33, 29, 0.12),
+      0 4px 8px -2px rgba(36, 33, 29, 0.18),
+      0 22px 40px -14px rgba(36, 33, 29, 0.45);
+  }
+  .paperclip {
+    position: absolute;
+    top: -40px;
+    left: 18px;
+    width: 36px;
+    height: 115px;
+    transform: rotate(6deg);
+    overflow: visible;
+  }
+  .paperclip.back { z-index: 0; }
+  .paperclip.front { z-index: 2; }
+  .wire-shadow { stroke: rgba(0, 0, 0, 0.35); stroke-width: 3.4; transform: translate(1.5px, 2px); filter: blur(1px); }
+  .wire { stroke: #8d939a; stroke-width: 2.6; }
+  .wire.dim { stroke: #767c83; }
+  .wire-shine { stroke: #e4e7ea; stroke-width: 0.9; transform: translate(-0.6px, -0.4px); opacity: 0.9; }
+
+  /* Hover: the card lifts a few pixels and straightens, gliding into place. Small enough to keep on for everyone. */
+  .clipped:hover { transform: rotate(-0.2deg) translateY(-4px); }
+  .clipped:hover .pg {
+    box-shadow:
+      0 1px 1px rgba(36, 33, 29, 0.1),
+      0 8px 14px -4px rgba(36, 33, 29, 0.2),
+      0 34px 56px -18px rgba(36, 33, 29, 0.5);
+  }
+  .clipped { transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  .pg { transition: box-shadow 0.45s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  .highway { position: relative; height: 170px; background: var(--pg-lane); }
+  .notes { position: absolute; left: 20px; right: 20px; top: 14px; height: 92px; }
+  .notes span { position: absolute; border-radius: 5px; }
+  .keys { position: absolute; left: 20px; right: 20px; bottom: 0; height: 58px; display: flex; gap: 2px; }
+  .white { flex: 1 1 0; border-radius: 0 0 4px 4px; }
+  .black { position: absolute; top: 0; height: 36px; width: 3.6%; border-radius: 0 0 3px 3px; background: var(--pg-black-key); }
+  .body { padding: 32px 36px 36px; display: flex; flex-direction: column; gap: 18px; }
+  h2 { margin: 0; font-size: 30px; line-height: 1.15; font-weight: 500; }
+  .when { display: block; margin-top: 4px; font-size: 17px; font-weight: 300; color: var(--pg-muted); }
+  p { margin: 0; font-size: 19px; line-height: 1.6; font-weight: 300; color: var(--pg-ink-2); }
+  .clip { aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; background: #12171c; border: 1px solid rgba(255, 255, 255, 0.1); }
+  .clip iframe { width: 100%; height: 100%; border: 0; display: block; }
+  .placeholder-dark { display: flex; align-items: center; justify-content: center; padding: 20px; text-align: center; font-size: 15px; color: var(--pg-muted); }
+  .next { font-size: 17px; color: var(--pg-muted); }
+  .try {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    margin-top: 4px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    width: 100%;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--pg-right);
+    text-decoration: none;
+  }
+  .try span { transition: transform 0.2s ease; }
+  .try:hover { color: #9ccbf7; }
+  .try:hover span { transform: translateX(4px); }
+  @media (max-width: 600px) { .body { padding: 24px 20px 28px; } }
+</style>

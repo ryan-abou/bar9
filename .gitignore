@@ -1,0 +1,9 @@
+# Test issues for previewing the layout locally. Never published.
+src/content/issues/sample-*.md
+
+node_modules/
+dist/
+.astro/
+.env
+*.log
+.DS_Store

@@ -1,0 +1,118 @@
+---
+import Base from '../layouts/Base.astro';
+import PencilCircle from '../components/PencilCircle.astro';
+import { getIssues, readingTime, opening } from '../lib/issues';
+import { plan } from '../data/plan';
+import { SITE, url, formatDate, formatShortDate } from '../site';
+
+const issues = await getIssues();
+const latest = issues.at(-1);
+const newestFirst = issues.slice().reverse();
+const written = new Set(issues.map((i) => i.data.bar));
+const next = plan.find((p) => !written.has(p.bar));
+
+function tag(i: (typeof issues)[number]) {
+  if (i.data.sample) return 'sample';
+  if (i.data.status === 'draft') return 'draft';
+  return '';
+}
+---
+<Base>
+  <section class="wrap intro">
+    <p>
+      I'm Ryan. I'm building <a href={SITE.links.pianoglass}>PianoGlass</a>, a piano trainer for the
+      Meta Quest 3, and once a month I write here about the piano: where it came from, how it works,
+      and how people learn to play it.
+    </p>
+  </section>
+
+  {!latest && plan[0] && (
+    <section class="wrap" aria-labelledby="soon-h">
+      <div class="soon">
+        <p class="kicker">Issue 1 · coming in {plan[0].month}</p>
+        <h1 id="soon-h" class="title">{plan[0].title}</h1>
+        <p class="dek">Nothing's published yet. The first issue comes out on the first Sunday of {plan[0].month}, and there's an <a href={url('/rss.xml')}>RSS feed</a> if you want to know when.</p>
+      </div>
+    </section>
+  )}
+
+  <div class:list={['wrap', 'home', { hidden: !latest }]}>
+    {latest && (
+      <section class="latest" aria-labelledby="latest-h">
+        <p class="kicker">The newest one · No. {latest.data.bar}{tag(latest) && ` · ${tag(latest)}`}</p>
+        <h1 id="latest-h" class="title"><a class="quiet" href={url(`/issues/${latest.id}/`)}>{latest.data.title}</a></h1>
+        <p class="dek">{latest.data.dek}</p>
+        <p class="meta">{formatDate(latest.data.date)} · {readingTime(latest)}</p>
+        <p class="opening">{opening(latest)}</p>
+        <p class="read"><a href={url(`/issues/${latest.id}/`)}>Keep reading</a></p>
+      </section>
+    )}
+
+    <section id="issues" class="index" aria-labelledby="archive-h">
+      <h2 id="archive-h">Every issue</h2>
+      <ol class="list">
+        {newestFirst.map((i, n) => (
+          <li>
+            <span class="no">{n === 0 ? <PencilCircle>{i.data.bar}</PencilCircle> : i.data.bar}</span>
+            <span class="entry">
+              <a href={url(`/issues/${i.id}/`)}>{i.data.title}</a>
+              <span class="date">{formatShortDate(i.data.date)}{tag(i) && ` · ${tag(i)}`}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+      {next && <p class="next">Next, in {next.month}: {next.title}.</p>}
+    </section>
+  </div>
+
+  <section id="about" class="wrap about" aria-labelledby="about-h">
+    <div class="about-inner">
+      <h2 id="about-h" class="section-title">Why it's called {SITE.name}</h2>
+      <div class="cols">
+        <p>When you finish a song in PianoGlass, it goes through what you played bar by bar and tells you which one to work on. It'll say something like "Bar 9 needs work." Piano teachers have been doing that for a long time with a pencil circle around the bar.</p>
+        <p>Most of what I write is about the instrument itself. The last few paragraphs of each issue are about what I changed in PianoGlass that month.</p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .intro { padding-top: 56px; padding-bottom: 56px; }
+  .intro p { margin: 0; max-width: 980px; font-family: var(--display); font-size: clamp(28px, 3.4vw, 44px); line-height: 1.25; }
+
+  .soon { display: flex; flex-direction: column; gap: 18px; padding-top: 28px; padding-bottom: 24px; border-top: 2px solid var(--ink); max-width: 820px; }
+  .soon .title { font-size: clamp(40px, 5.2vw, 72px); }
+  .home.hidden { display: none; }
+  .home { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 72px; align-items: start; padding-bottom: 24px; }
+
+  .latest { display: flex; flex-direction: column; gap: 18px; padding-top: 28px; border-top: 2px solid var(--ink); }
+  .latest .title { font-size: clamp(40px, 5.2vw, 72px); }
+  .latest .dek { max-width: 640px; }
+  .meta { margin: 0; font-size: 16px; color: var(--gray); }
+  .opening { margin: 12px 0 0; max-width: 640px; font-size: 20px; line-height: 1.72; }
+  .opening::first-letter { float: left; margin: 8px 10px 0 0; font-family: var(--display); font-size: 4.4em; line-height: 0.78; }
+  .read { margin: 6px 0 0; font-size: 19px; }
+  .quiet { text-decoration: none; }
+  .quiet:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 8px; }
+
+  .index { padding-top: 28px; border-top: 2px solid var(--ink); }
+  .index h2 { margin: 0 0 6px; font-family: var(--display); font-weight: 400; font-size: 26px; }
+  .list { list-style: none; margin: 0; padding: 0; }
+  .list li { display: grid; grid-template-columns: 40px minmax(0, 1fr); align-items: baseline; gap: 10px; padding: 14px 0; border-bottom: 1px solid var(--rule); }
+  .no { font-style: italic; color: var(--gray); font-size: 16px; text-align: center; }
+  .entry { display: flex; flex-direction: column; gap: 2px; }
+  .entry a { text-decoration: none; font-size: 18px; line-height: 1.35; }
+  .entry a:hover { text-decoration: underline; text-decoration-thickness: 1px; }
+  .date { font-size: 14px; color: var(--gray); }
+  .next { margin: 14px 0 0; font-size: 15px; color: var(--gray); font-style: italic; }
+
+  .about { padding-top: 72px; }
+  .about-inner { border-top: 1px solid var(--rule); padding-top: 32px; }
+  .cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px; }
+  .cols p { margin: 0; font-size: 19px; line-height: 1.65; }
+
+  @media (max-width: 960px) {
+    .home { grid-template-columns: minmax(0, 1fr); gap: 48px; }
+    .cols { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  }
+</style>
