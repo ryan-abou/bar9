@@ -29,11 +29,30 @@
   --gap: 48px;
   --text-col: 680px;
   --side-col: 200px;
+
+  /* Motion tokens (transitions.dev): quick feedback, never page-load choreography. */
+  --duration-quick: 150ms;
+  --duration-fast: 250ms;
+  --duration-slow: 400ms;
+  --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --text-swap-dur: 150ms;
+  --text-swap-translate-y: 4px;
+  --text-swap-blur: 2px;
+  --text-swap-ease: ease-in-out;
+  --shake-distance: 6px;
+  --shake-overshoot: 4px;
+  --shake-dur-a: 80ms;
+  --shake-dur-b: 60ms;
+  --shake-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html { background: var(--paper); }
+html { background: var(--paper); scrollbar-color: var(--staff) var(--paper); }
+
+/* The parts of the page the browser draws, in the page's own ink and pencil. */
+::selection { background: color-mix(in srgb, var(--pencil) 20%, transparent); color: var(--ink); }
+input, textarea { caret-color: var(--pencil); }
 
 body {
   margin: 0;
@@ -101,7 +120,6 @@ a:hover { text-decoration-color: var(--ink); text-underline-offset: 6px; }
 .site-footer { padding-top: 24px; padding-bottom: 48px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 16px; color: var(--gray); }
 
 /* Type */
-.kicker { margin: 0; font-style: italic; font-size: 19px; color: var(--gray); }
 h1.title { margin: 0; font-family: var(--display); font-size: clamp(42px, 6vw, 68px); line-height: 1.04; font-weight: 400; }
 .dek { margin: 0; font-size: 22px; line-height: 1.55; color: var(--ink-2); }
 .byline { margin: 0; font-size: 17px; color: var(--gray); }
@@ -143,6 +161,45 @@ h1.title { margin: 0; font-family: var(--display); font-size: clamp(42px, 6vw, 6
 figure { margin: 0; }
 figcaption { margin-top: 12px; font-style: italic; font-size: 16px; color: var(--gray); }
 .placeholder { display: flex; align-items: center; justify-content: center; padding: 24px; text-align: center; font-style: italic; font-size: 17px; color: var(--gray); background: var(--paper-2); border: 1px dashed var(--staff); }
+
+/* The pencil circles draw themselves when a page opens: the stroke runs around the 9 like a
+   teacher marking the bar. It stays on with reduced motion too: it's a line being drawn in
+   place, nothing moves across the screen. */
+.pencil-loop {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: pencil-draw 0.9s var(--ease-smooth-out) 0.25s forwards;
+}
+.staff .pencil-loop { animation-delay: 0.7s; }
+@keyframes pencil-draw { to { stroke-dashoffset: 0; } }
+
+/* transitions.dev: text states swap (status lines) and the error shake (signup field). */
+.t-text-swap {
+  display: inline-block;
+  transform: translateY(0);
+  filter: blur(0);
+  opacity: 1;
+  transition:
+    transform var(--text-swap-dur) var(--text-swap-ease),
+    filter var(--text-swap-dur) var(--text-swap-ease),
+    opacity var(--text-swap-dur) var(--text-swap-ease);
+}
+.t-text-swap.is-exit { transform: translateY(calc(var(--text-swap-translate-y) * -1)); filter: blur(var(--text-swap-blur)); opacity: 0; }
+.t-text-swap.is-enter-start { transform: translateY(var(--text-swap-translate-y)); filter: blur(var(--text-swap-blur)); opacity: 0; transition: none; }
+.t-input.is-shaking { animation: t-input-shake calc(var(--shake-dur-a) * 2 + var(--shake-dur-b) * 2) linear; }
+@keyframes t-input-shake {
+  0%      { transform: translateX(0);                                 animation-timing-function: var(--shake-ease); }
+  28.57%  { transform: translateX(var(--shake-distance));             animation-timing-function: var(--shake-ease); }
+  57.14%  { transform: translateX(calc(var(--shake-distance) * -1)); animation-timing-function: var(--shake-ease); }
+  78.57%  { transform: translateX(var(--shake-overshoot));            animation-timing-function: var(--shake-ease); }
+  100%    { transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-text-swap { transition: none !important; }
+  .t-input { animation: none !important; transform: none !important; }
+  a, a span { transition: none !important; }
+}
 
 @media (max-width: 900px) {
   .score { grid-template-columns: minmax(0, 1fr); }

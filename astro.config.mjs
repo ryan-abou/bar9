@@ -10,4 +10,6 @@ export default defineConfig({
   site: SITE,
   base: BASE,
   trailingSlash: 'ignore',
+  // No floating Astro toolbar over the page in `npm run dev`.
+  devToolbar: { enabled: false },
 });

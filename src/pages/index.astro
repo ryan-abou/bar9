@@ -30,9 +30,9 @@ function tag(i: (typeof issues)[number]) {
   {!latest && plan[0] && (
     <section class="wrap" aria-labelledby="soon-h">
       <div class="soon">
-        <p class="kicker">Issue 1 · coming in {plan[0].month}</p>
         <h1 id="soon-h" class="title">{plan[0].title}</h1>
         <p class="dek">Nothing's published yet. The first issue comes out on the 9th of {plan[0].month}. <a href="#subscribe">Sign up below</a> and it'll come to you by email.</p>
+        <p class="meta">Issue 1 · coming in {plan[0].month}</p>
       </div>
     </section>
   )}
@@ -40,10 +40,9 @@ function tag(i: (typeof issues)[number]) {
   <div class:list={['wrap', 'home', { hidden: !latest }]}>
     {latest && (
       <section class="latest" aria-labelledby="latest-h">
-        <p class="kicker">The newest one · No. {latest.data.bar}{tag(latest) && ` · ${tag(latest)}`}</p>
         <h1 id="latest-h" class="title"><a class="quiet" href={url(`/issues/${latest.id}/`)}>{latest.data.title}</a></h1>
         <p class="dek">{latest.data.dek}</p>
-        <p class="meta">{formatDate(latest.data.date)} · {readingTime(latest)}</p>
+        <p class="meta">The newest one, No. {latest.data.bar} · {formatDate(latest.data.date)} · {readingTime(latest)}{tag(latest) && ` · ${tag(latest)}`}</p>
         <p class="opening">{opening(latest)}</p>
         <p class="read"><a href={url(`/issues/${latest.id}/`)}>Keep reading</a></p>
       </section>

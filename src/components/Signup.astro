@@ -19,46 +19,68 @@ const {
   <p class="lede">{text}</p>
   <form class="signup-form" action={SITE.newsletter.action} method="post" novalidate>
     <label class="sr" for={`${id}-email`}>Email address</label>
-    <input id={`${id}-email`} type="email" name="email_address" placeholder="you@example.com" autocomplete="email" required />
+    <input class="t-input" id={`${id}-email`} type="email" name="email_address" placeholder="you@example.com" autocomplete="email" required />
     <button type="submit">Sign up</button>
   </form>
-  <p class="status" role="status" aria-live="polite"></p>
+  <p class="status" role="status" aria-live="polite"><span class="t-text-swap"></span></p>
   <p class="fine">You'll get one email to confirm first. Every email has an unsubscribe link.</p>
 </section>
 
 <script>
+  // transitions.dev "text states swap": the old words leave upward with a little blur, the new ones rise in.
+  function swapText(el: HTMLElement & { _swap?: number }, next: string) {
+    if (el.textContent === next) return;
+    clearTimeout(el._swap);
+    el.classList.add('is-exit');
+    el._swap = window.setTimeout(() => {
+      el.textContent = next;
+      el.classList.remove('is-exit');
+      el.classList.add('is-enter-start');
+      void el.offsetWidth;
+      el.classList.remove('is-enter-start');
+    }, 150);
+  }
+  // transitions.dev "error state shake" on the email field.
+  function shake(el: HTMLElement) {
+    el.classList.remove('is-shaking');
+    void el.offsetWidth;
+    el.classList.add('is-shaking');
+  }
+
   document.querySelectorAll<HTMLFormElement>('.signup-form').forEach((form) => {
     const box = form.closest('.signup')!;
-    const status = box.querySelector<HTMLElement>('.status')!;
+    const status = box.querySelector<HTMLElement>('.status .t-text-swap')!;
     const button = form.querySelector('button')!;
     const input = form.querySelector('input')!;
+    const say = (msg: string, state?: 'error' | 'done') => {
+      box.classList.toggle('error', state === 'error');
+      box.classList.toggle('done', state === 'done');
+      swapText(status, msg);
+    };
+    input.addEventListener('input', () => box.classList.remove('error'));
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = input.value.trim();
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        status.textContent = "That doesn't look like an email address.";
-        box.classList.add('error');
+        say("That doesn't look like an email address.", 'error');
+        shake(input);
         input.focus();
         return;
       }
-      box.classList.remove('error');
       button.disabled = true;
-      status.textContent = 'Signing you up…';
+      say('Signing you up…');
       try {
         const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
         const data = await res.json().catch(() => ({}));
         if (res.ok && data.status === 'success') {
-          box.classList.add('done');
-          status.textContent = `Almost done. Check ${email} and click the link in the email from Ryan to confirm.`;
+          say(`Almost done. Check ${email} and click the link in the email from Ryan to confirm.`, 'done');
           form.reset();
         } else {
           const msg = data.errors?.messages?.[0];
-          box.classList.add('error');
-          status.textContent = msg ? `${msg}.`.replace(/\.\.$/, '.') : "Something went wrong. Try again in a minute.";
+          say(msg ? `${msg}.`.replace(/\.\.$/, '.') : "Something went wrong. Try again in a minute.", 'error');
         }
       } catch {
-        box.classList.add('error');
-        status.textContent = "Couldn't reach the signup service. Check your connection and try again.";
+        say("Couldn't reach the signup service. Check your connection and try again.", 'error');
       } finally {
         button.disabled = false;
       }
@@ -78,6 +100,8 @@ const {
   }
   input::placeholder { color: #8f887c; }
   input:focus { outline: 2px solid var(--ink); outline-offset: 1px; border-color: var(--ink); }
+  input { transition: border-color var(--duration-quick) ease-out; }
+  .error input { border-color: var(--pencil); outline-color: var(--pencil); }
   button {
     min-height: 48px; padding: 0 22px; font: inherit; font-size: 18px;
     color: var(--paper); background: var(--ink); border: 0; border-radius: 4px; cursor: pointer;
