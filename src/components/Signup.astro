@@ -67,13 +67,15 @@ const {
         const r = line.getBoundingClientRect();
         const bottom = vv ? vv.offsetTop + vv.height : window.innerHeight;
         const over = r.bottom + 16 - bottom;
-        if (over > 0) window.scrollBy({ top: over, behavior: 'smooth' });
+        if (over > 0) window.scrollBy(0, over);
       };
+      // The keyboard slides up over a few hundred ms, so check on every resize while it does, and once more after.
       nudge();
       if (vv) {
-        vv.addEventListener('resize', nudge, { once: true });
+        vv.addEventListener('resize', nudge);
         setTimeout(() => vv.removeEventListener('resize', nudge), 1500);
       }
+      setTimeout(nudge, 900);
     };
     input.addEventListener('input', () => box.classList.remove('error'));
     form.addEventListener('submit', async (e) => {
