@@ -28,7 +28,8 @@ Sample issues (`sample: true`) are for previewing the layout. They show in
 
 ## Schedule
 
-- A new issue on the **first Sunday of each month**. Bar 1 is December 6, 2026.
+- A new issue on the **9th of each month**, because the blog is called Bar 9.
+  Bar 1 is Wednesday, December 9, 2026.
 - Around the 20th of the month before: pick the story from `src/data/plan.ts`
   (ideas in `topics.md`) and start its file in `src/content/issues/`.
 - In the last week: write the PianoGlass part from the month's commits

@@ -1,7 +1,7 @@
 ---
 bar: 1
 title: The instrument named for what it could do
-date: 2026-12-06
+date: 2026-12-09
 dek: Around 1700, an instrument keeper in Florence built a keyboard you could play quietly or loudly just by changing how hard you pressed. We still call it by that trick.
 status: draft
 homeNote: "p = piano, soft\nf = forte, loud"

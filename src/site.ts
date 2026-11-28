@@ -6,7 +6,7 @@ export const SITE = {
   author: 'Ryan Abourjeili',
   description:
     'I write about the piano once a month, and about PianoGlass, the piano trainer I’m building for the Meta Quest 3.',
-  schedule: 'comes out on the first Sunday of each month',
+  schedule: 'comes out on the 9th of each month',
   // Kit form "Bar 9 signup". Kit sends a confirmation email, then redirects to /welcome/.
   newsletter: {
     action: 'https://app.kit.com/forms/10249989/subscriptions',

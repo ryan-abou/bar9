@@ -5,7 +5,7 @@ gets an email version here, and Ryan pastes it into Kit and sends it.
 
 ## When
 
-On the first Sunday of the month, right after the issue is published (status
+On the 9th of the month, right after the issue is published (status
 `published` and pushed, so the link works).
 
 ## In Kit
