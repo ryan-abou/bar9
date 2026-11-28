@@ -1,0 +1,19 @@
+---
+// GitHub Pages serves this for any /bar9/ address that doesn't exist.
+import Base from '../layouts/Base.astro';
+import { url } from '../site';
+---
+<Base title="Page not found">
+  <section class="wrap">
+    <div class="lost">
+      <h1 class="title">That page isn't here.</h1>
+      <p class="dek">The link might have a typo, or the issue moved. Every issue is listed on the home page.</p>
+      <p class="links"><a href={url('/')}>Back to Bar 9</a></p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .lost { display: flex; flex-direction: column; gap: 18px; padding: 64px 0 24px; border-top: 2px solid var(--ink); margin-top: 56px; max-width: 760px; }
+  .links { margin: 8px 0 0; font-size: 19px; }
+</style>
